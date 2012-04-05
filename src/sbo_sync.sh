@@ -54,6 +54,7 @@ fi
 touch $SBO_LOCAL_REPOSITORY/.writable 2>&1
 if [ $? -ne 0 ]; then
     echo "$me: Error, you do not have write permission in $SBO_LOCAL_REPOSITORY"
+    exit 1
 fi
 rm -f $SBO_LOCAL_REPOSITORY/.writable
 
