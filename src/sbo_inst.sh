@@ -11,7 +11,7 @@ Usage:
 $me [-n] [string]
 
 About:
-$me searchs (incase sensitive) for a package name matching the
+$me searches (incase sensitive) for a package name matching the
 given string inside /var/log/packages and print a formated output
 with the last status change time for each file which would (in most
 cases) indicate the date that package was installed.

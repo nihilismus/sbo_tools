@@ -9,7 +9,7 @@ Usage:
 $me SlackBuild_name
 
 About:
-$me searchs for a SlackBuild directory in the local repository
+$me searches for a SlackBuild directory in the local repository
 matching the given SlackBuild_name. It makes the search in case
 insensitive. You can use the wildcard '*' in SlackBuild_name,
 and if this is the case you must enclose it with single quotes
