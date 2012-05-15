@@ -78,18 +78,29 @@ wget \
     --no-clobber \
     --continue \
     --no-use-server-timestamps \
-    $DOWNLOAD
+    $DOWNLOAD 2>&1 | tee $package.log
 
-# The newest file *must be* the source code from $DOWNLOAD
-download_file=$(ls -1t | head -1)
-md5sum_file=$(md5sum $download_file | awk '{print $1}')
+downloaded_files=( $(grep -e 'saved' -e 'already there' $package.log | \
+    sed -e 's/^.* - //g' -e 's/ saved .*//g' \
+    -e 's/^File //g' -e 's/ already there.*//g' \
+    -e 's/'\''//g' -e 's/'\`'//g') )
 
-if [ $md5sum_file != $MD5SUM ]; then
-    echo "$me: Error, MD5 message digest does not match for $download_file"
-    echo "  MD5 expected: $MD5SUM"
-    echo "  MD5 obtained: $md5sum_file"
-    exit 1
-fi
+md5sums=( $(echo $MD5SUM ))
+
+num_md5sums=$(echo $MD5SUM | wc -w)
+
+echo "$me: Checking MD5 message digest"
+
+index=0
+while [[ $index -lt $num_md5sums ]]; do
+    error=0;
+    echo ${md5sums[$index]}  ${downloaded_files[$index]} | md5sum -c - || error=1
+    if [ $error != 0 ]; then
+        echo "$me: Error, md5 does not match for ${downloaded_files[$index]}"
+        exit 1
+    fi
+    index=$index+1
+done
 
 echo "$me: Executing $package.SlackBuild"
 sh $package.SlackBuild || exit 1
