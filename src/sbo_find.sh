@@ -17,14 +17,18 @@ to avoid pathname expansion by the shell.
 
 Examples:
 
-  This prints all SlackBuilds' directories inside the repository:
+  This prints all SlackBuilds directories inside the repository:
     $me '*'
 
-  This prints all SlackBuilds' directories that starts with 'py'.
+  This prints all SlackBuilds directories that starts with 'py'.
     $me 'py*'
 
-  This prints all SlackBuilds' directories that ends with 'kernel'.
+  This prints all SlackBuilds directories that ends with 'kernel'.
     $me '*kernel'
+
+  This print all SlackBuilds directories that has 'font' in their
+  name.
+    $me font
 EOF
 }
 
@@ -56,14 +60,27 @@ case $# in
             exit
         fi
         search=$1
+        asterisk=$(echo $1 | grep '*' || echo '')
+        if [ -z "$asterisk" ]; then
+            results=$(find $SBO_LOCAL_REPOSITORY/ -maxdepth 2 -mindepth 2 -type d -iname "*$search*")
+        else
+            results=$(find $SBO_LOCAL_REPOSITORY/ -maxdepth 2 -mindepth 2 -type d -iname "$search")
+        fi
+        ;;
+    2)
+        search=$2
+        if [ $1 = "-e" ]; then
+            results=$(find $SBO_LOCAL_REPOSITORY/ -maxdepth 2 -mindepth 2 -type d -iname "$search")
+        else
+            usage
+            exit
+        fi
         ;;
     *)
         usage
         exit 1
         ;;
 esac
-
-results=$(find $SBO_LOCAL_REPOSITORY/ -maxdepth 2 -mindepth 2 -type d -iname "$search")
 
 if [ -z "$results" ]; then
     echo "$me: Error, no results for '$search'"
