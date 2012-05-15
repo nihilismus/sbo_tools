@@ -9,6 +9,7 @@ of The SlackBuilds.org project.
 * **sbo_pkg**: creates a Slackware package using a SlackBuild file.
 * **sbo_find**: searches through the local repository for a given SlackBuild.
 * **sbo_inst**: lists/searches for installed packages.
+* **sbo_dff**: print a list of updates.
 
 # Installation
 
@@ -37,3 +38,12 @@ Same as installation, to uninstall from `/usr/bin` execute:
 
 Execute any of the tools with the `--help` option to get a basic
 documentation about their use.
+
+# TODO
+
+* Add more documentation (man pages?, wiki?, examples?)
+* Improve code, maybe it would need a restructuring.
+
+# Contact me
+hba.nihilismus@gmail.com
+http://twitter.com/nihilipster
