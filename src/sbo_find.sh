@@ -8,7 +8,7 @@ Usage:
 $me SlackBuild_name
 
 About:
-$me searches for a SlackBuild directory in the local repository
+$me searches for an SlackBuild directory in the local repository
 matching the given SlackBuild_name. It makes the search in case
 insensitive. You can use the wildcard '*' in SlackBuild_name,
 and if this is the case you must enclose it with single quotes
@@ -17,21 +17,27 @@ to avoid pathname expansion by the shell.
 Examples:
 
   This prints all SlackBuilds directories inside the repository:
+
     $me '*'
 
   This prints all SlackBuilds directories that starts with 'py':
+
     $me 'py*'
 
   This prints all SlackBuilds directories that ends with 'kernel':
+
     $me '*kernel'
 
   This prints all SlackBuilds directories that has 'font' in their
   name:
+
     $me font
 
-  This prints the SlackBuild directorie that match exactly
+  This prints the SlackBuild directory that match exactly
   'virtualbox-kernel':
+
     $me -e virtualbox-kernel
+
   in contrast with:
     $me virtualbox-kernel
 EOF

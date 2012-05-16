@@ -8,7 +8,7 @@ Usage:
 $me [directory]
 
 About:
-$me creates a Slackware package using a SlackBuild script from
+$me creates an Slackware package using an SlackBuild script from
 http://www.slackbuilds.org.
 
 directory is the SlackBuild script's directory and should cointain all
