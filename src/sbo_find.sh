@@ -2,7 +2,6 @@
 
 me=$(basename $0)
 
-
 usage() {
 cat << EOF
 Usage:
@@ -20,32 +19,32 @@ Examples:
   This prints all SlackBuilds directories inside the repository:
     $me '*'
 
-  This prints all SlackBuilds directories that starts with 'py'.
+  This prints all SlackBuilds directories that starts with 'py':
     $me 'py*'
 
-  This prints all SlackBuilds directories that ends with 'kernel'.
+  This prints all SlackBuilds directories that ends with 'kernel':
     $me '*kernel'
 
-  This print all SlackBuilds directories that has 'font' in their
-  name.
+  This prints all SlackBuilds directories that has 'font' in their
+  name:
     $me font
+
+  This prints the SlackBuild directorie that match exactly
+  'virtualbox-kernel':
+    $me -e virtualbox-kernel
+  in contrast with:
+    $me virtualbox-kernel
 EOF
 }
-
-SBO_LOCAL_REPOSITORY=${SBO_LOCAL_REPOSITORY:-/usr/ports}
 
 set -f
 set -e
 
-if [ -z "$SLACKWARE_VERSION" ]; then
-    echo "$me: Error, enviroment variable SLACKWARE_VERSION is not defined"
-    exit 1
-fi
+slk_version=13.37
+local_repository="/usr/ports/$slk_version"
 
-SBO_LOCAL_REPOSITORY=$SBO_LOCAL_REPOSITORY/$SLACKWARE_VERSION
-
-if [ ! -d $SBO_LOCAL_REPOSITORY/ ]; then
-    echo "$me: Error, directory $SBO_LOCAL_REPOSITORY does not exist."
+if [ ! -d $local_repository/ ]; then
+    echo "$me: Error, directory $local_repository does not exist."
     exit 1
 fi
 
@@ -62,15 +61,15 @@ case $# in
         search=$1
         asterisk=$(echo $1 | grep '*' || echo '')
         if [ -z "$asterisk" ]; then
-            results=$(find $SBO_LOCAL_REPOSITORY/ -maxdepth 2 -mindepth 2 -type d -iname "*$search*")
+            results=$(find $local_repository/ -maxdepth 2 -mindepth 2 -type d -iname "*$search*")
         else
-            results=$(find $SBO_LOCAL_REPOSITORY/ -maxdepth 2 -mindepth 2 -type d -iname "$search")
+            results=$(find $local_repository/ -maxdepth 2 -mindepth 2 -type d -iname "$search")
         fi
         ;;
     2)
         search=$2
         if [ $1 = "-e" ]; then
-            results=$(find $SBO_LOCAL_REPOSITORY/ -maxdepth 2 -mindepth 2 -type d -iname "$search")
+            results=$(find $local_repository/ -maxdepth 2 -mindepth 2 -type d -iname "$search")
         else
             usage
             exit
