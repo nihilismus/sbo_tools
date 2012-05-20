@@ -9,7 +9,8 @@ of The SlackBuilds.org project.
 * **sbo_pkg**: creates a Slackware package using a SlackBuild file.
 * **sbo_find**: searches through the local repository for a given SlackBuild.
 * **sbo_inst**: lists/searches for installed packages.
-* **sbo_dff**: print a list of updates.
+* **sbo_diff**: print a list of updates.
+* **sbo_wwws**: a command-line interface to http://slackbuilds.org/result/
 
 # Installation
 
@@ -45,5 +46,6 @@ documentation about their use.
 * Improve code, maybe it would need a restructuring.
 
 # Contact me
-hba.nihilismus@gmail.com
-http://twitter.com/nihilipster
+
+* hba.nihilismus@gmail.com
+* http://twitter.com/nihilipster
