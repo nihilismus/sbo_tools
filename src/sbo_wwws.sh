@@ -32,11 +32,24 @@ search() {
     server="http://slackbuilds.org"
     resource="result/?search=$1&sv=13.37"
 
-    lynx -dump "$server/$resource" | grep "$server/repository/" | \
-        sed 's/^.*repository/\/usr\/ports/'
+    result=$(lynx -dump "$server/$resource" | grep \
+        "$server/repository/" | \
+        sed 's/^.*repository/\/usr\/ports/' | \
+        sed '/\/usr\/ports\/13.37\/$/d' | sort)
+
+    echo "Search Results for '$1':"
+
+    for directory in $result; do
+        about=""
+        if [ -f "$directory/slack-desc" ]; then
+            about=$(grep -A 1 'handy-ruler' $directory/slack-desc | \
+                tail -1 | sed -e 's/^.* (//' -e 's/) *$//')
+        fi
+        echo $directory $about | sed -e 's/\/ / /' \
+            -e 's/  */ /g' -e 's/\/$//'
+    done
 }
 
-# MAIN
 case $# in
     0)
         usage
@@ -47,12 +60,12 @@ case $# in
             usage
             exit 1
         else
-            search $1 | sed '/\/usr\/ports\/13.37\/$/d'
+            search $1
         fi
         ;;
     *)
         for string in $@; do
-            search $string | sed '/\/usr\/ports\/13.37\/$/d'
+            search $string
         done
         ;;
 esac
