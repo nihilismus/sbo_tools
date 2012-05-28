@@ -27,7 +27,23 @@ if [ $(id --user) -ne 0 ]; then
     exit 1
 fi
 
-slk_version=13.37
+# Get a list of slackware versions available at SBo's rsyncd
+sbo_rsync_modules=$(rsync slackbuilds.org::slackbuilds | awk '{print $5}' | \
+    sed 's/^.$//')
+
+if [ -z "$sbo_rsync_modules" ]; then
+    echo "$me: Error, while contacting slackbuilds.org"
+    exit 1
+fi
+
+# Detect the slackware version from /etc/slackware-version
+for module in $sbo_rsync_modules; do
+    matched=$(grep "$module" /etc/slackware-version || echo '')
+    if [ ! -z "$matched" ]; then
+        slk_version=$module
+    fi
+done
+
 local_repository="/usr/ports/$slk_version"
 
 if [ ! -d $local_repository/ ]; then

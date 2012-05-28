@@ -46,7 +46,20 @@ EOF
 set -f
 set -e
 
-slk_version=13.37
+directories=$(find /usr/ports/ -type d -mindepth 1 -maxdepth 1  -exec basename {} \;)
+if [ -z "$directories" ]; then
+    echo "$me: Error, /usr/ports seems to be empty"
+    exit 1
+fi
+
+# Detect the slackware version from /etc/slackware-version
+for directory in $directories; do
+    matched=$(grep "$directory" /etc/slackware-version || echo '')
+    if [ ! -z "$matched" ]; then
+        slk_version=$directory
+    fi
+done
+
 local_repository="/usr/ports/$slk_version"
 
 if [ ! -d $local_repository/ ]; then
