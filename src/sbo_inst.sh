@@ -53,7 +53,13 @@ case $# in
             exit
         fi
 
-        result=$(search "$1" | awk '{print $1" "$2" "$3"\\n"}')
+        asterisk=$(echo $1 | grep '*' || echo '')
+        if [ -z "$asterisk" ]; then
+            result=$(search "*$1*" | awk '{print $1" "$2" "$3"\\n"}')
+        else
+            result=$(search "$1" | awk '{print $1" "$2" "$3"\\n"}')
+        fi
+
         if [ -z "$result" ]; then
             echo "$me: Error, no results for '$1'"
             exit 1
@@ -64,7 +70,13 @@ case $# in
         ;;
     2)
         if [ $1 = "-n" ]; then
-            result=$(search "$2" | awk '{print $3"\\n"}')
+            asterisk=$(echo $2 | grep '*' || echo '')
+            if [ -z "$asterisk" ]; then
+                result=$(search "*$2*" | awk '{print $3"\\n"}')
+            else
+                result=$(search "$2" | awk '{print $3"\\n"}')
+            fi
+
             if [ -z "$result" ]; then
                 echo "$me: Error, no results for '$2'"
                 exit 1
