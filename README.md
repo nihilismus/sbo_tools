@@ -3,6 +3,19 @@
 **sbo_tools** is a set of Bash scripts to help you in your daily use
 of The SlackBuilds.org project.
 
+# Features
+
+* No configuration file: based in "Convention over configuration".
+* It does not put in your way: based in "Write programs that do one thing and do it well."
+* No dialog-based: just the command line interface you already know,
+  so you can use `cd`, `ls`, `cat`, `vi`,  you name it.
+
+# Notes
+
+* sbo_tools is not part of The SlackBuilds.org project.
+* There's another well-know tool at http://sbopkg.org if you are interesting
+  in something with a dialog-based-configuration-files-all-in-one-command approach.
+
 # Tools
 
 * **sbo_sync**: synchronize a local repository of Slackware build scripts.
@@ -11,15 +24,20 @@ of The SlackBuilds.org project.
 * **sbo_inst**: lists/searches for installed packages.
 * **sbo_diff**: print a list of updates.
 * **sbo_wwws**: a command-line interface to http://slackbuilds.org/result/
+* **sbo_info**: given an SlackBuild's directoru prints a minimal formated information.
 
 # Installation
 
-As root execute:
+As normal-user/root execute:
+
+`git clone https://github.com/nihilismus/sbo_tools.git`
+
+Inside sbo_tools directory, execute as root:
 
 `make`
 
-By default the tools would be installed inside `/usr/local/bin`, to install
-in other directory execute as, for example:
+By default the tools are going to be installed inside `/usr/local/bin`, to install
+in another directory execute, for example:
 
 `make PREFIX=/usr`
 
@@ -27,13 +45,19 @@ This would install the tools inside `/usr/bin`
 
 # Uninstallation
 
-As root execute:
+Inside sbo_tools directory, execute as root:
 
 `make uninstall`
 
 Same as installation, to uninstall from `/usr/bin` execute:
 
 `make PREFIX=/usr uninstall`
+
+# Update
+
+Inside sbo_tools directory, execute as normal-user/root:
+
+`git pull`
 
 # Usage
 
@@ -43,7 +67,11 @@ documentation about their use.
 # TODO
 
 * Add more documentation (man pages?, wiki?, examples?)
-* Improve code, maybe it would need a restructuring.
+* Improve code, maybe it would need a restructuring (at this moment
+  is a mess, but a good one ;)
+* Make use of sbopkg queue files, http://www.sbopkg.org/queues.php (at this moment
+  there's no way to program the installation of a package from its SlackBuild with
+  its corresponding dependencies)
 
 # Contact me
 
