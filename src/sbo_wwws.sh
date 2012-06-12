@@ -30,12 +30,12 @@ set -e
 
 search() {
     server="http://slackbuilds.org"
-    resource="result/?search=$1&sv=13.37"
+    resource="result/?search=$1&sv=$slk_version"
 
     result=$(lynx -dump "$server/$resource" | grep \
         "$server/repository/" | \
         sed 's/^.*repository/\/usr\/ports/' | \
-        sed '/\/usr\/ports\/13.37\/$/d' | sort)
+        sed "/\/usr\/ports\/$slk_version\/$/d" | sort)
 
     echo "Search Results for '$1':"
 
@@ -49,6 +49,27 @@ search() {
             -e 's/  */ /g' -e 's/\/$//'
     done
 }
+
+directories=$(find /usr/ports/ -type d -mindepth 1 -maxdepth 1  -exec basename {} \;)
+if [ -z "$directories" ]; then
+    echo "$me: Error, /usr/ports seems to be empty"
+    exit 1
+fi
+
+# Detect the slackware version from /etc/slackware-version
+for directory in $directories; do
+    matched=$(grep "$directory" /etc/slackware-version || echo '')
+    if [ ! -z "$matched" ]; then
+        slk_version=$directory
+    fi
+done
+
+local_repository="/usr/ports/$slk_version"
+
+if [ ! -d $local_repository/ ]; then
+    echo "$me: Error, directory $local_repository does not exist."
+    exit 1
+fi
 
 case $# in
     0)
