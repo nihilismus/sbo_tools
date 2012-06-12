@@ -43,9 +43,10 @@ if [ ! -d $directory/ ]; then
     exit 1
 fi
 
-touch $directory/.writable 2>&1
-if [ $? -ne 0 ]; then
-    echo "$me: Error, you do not have write permission in $directory"
+touch $directory/.writable >/dev/null 2>&1 || true
+if [ ! -f $directory/.writable ]; then
+    echo "$me: Error, no write permissions in $directory"
+    exit 1
 fi
 rm -f $directory/.writable
 
@@ -61,13 +62,21 @@ if [ ! -f $info_file ]; then
     exit 1
 fi
 
-if [ ! -f $slackbuild_file ]; then
-    echo "$me: Error $slackbuild_file does not exist."
+echo "$me: Executing $info_file"
+source $info_file
+
+md5sums=($(echo $MD5SUM))
+num_md5sums=$(echo $MD5SUM | wc -w)
+
+if [ -z "$md5sums" ]; then
+    echo "$me: Error, no md5 message digest in $info_file"
     exit 1
 fi
 
-echo "$me: Executing $info_file"
-source $info_file
+if [ ! -f "$slackbuild_file" ]; then
+    echo "$me: Error $slackbuild_file does not exist."
+    exit 1
+fi
 
 echo "$me: Downloading $DOWNLOAD"
 
@@ -84,10 +93,6 @@ downloaded_files=( $(grep -e 'saved' -e 'already there' $package.log | \
     sed -e 's/^.* - //g' -e 's/ saved .*//g' \
     -e 's/^File //g' -e 's/ already there.*//g' \
     -e 's/'\''//g' -e 's/'\`'//g') )
-
-md5sums=( $(echo $MD5SUM ))
-
-num_md5sums=$(echo $MD5SUM | wc -w)
 
 echo "$me: Checking MD5 message digest"
 
