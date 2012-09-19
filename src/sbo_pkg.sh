@@ -86,7 +86,6 @@ wget \
     --timeout=60 \
     --no-clobber \
     --continue \
-    --no-use-server-timestamps \
     $DOWNLOAD 2>&1 | tee $package.log
 
 downloaded_files=( $(grep -e 'saved' -e 'already there' $package.log | \
