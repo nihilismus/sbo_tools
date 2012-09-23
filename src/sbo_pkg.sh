@@ -65,8 +65,20 @@ fi
 echo "$me: Executing $info_file"
 source $info_file
 
-md5sums=($(echo $MD5SUM))
-num_md5sums=$(echo $MD5SUM | wc -w)
+ARCH=${ARCH:-$(uname -m)}
+
+case $ARCH in
+	"x86_64")
+		md5sums=($(echo $MD5SUM_x86_64))
+		num_md5sums=$(echo $MD5SUM_x86_64 | wc -w)
+		downloads=$DOWNLOAD_x86_64
+		;;
+	*)
+		md5sums=($(echo $MD5SUM))
+		num_md5sums=$(echo $MD5SUM | wc -w)
+		downloads=$DOWNLOAD
+		;;
+esac
 
 if [ -z "$md5sums" ]; then
     echo "$me: Error, no md5 message digest in $info_file"
@@ -78,7 +90,7 @@ if [ ! -f "$slackbuild_file" ]; then
     exit 1
 fi
 
-echo "$me: Downloading $DOWNLOAD"
+echo "$me: Downloading $downloads"
 
 wget \
     --progress=bar \
@@ -86,7 +98,7 @@ wget \
     --timeout=60 \
     --no-clobber \
     --continue \
-    $DOWNLOAD 2>&1 | tee $package.log
+    $downloads 2>&1 | tee $package.log
 
 downloaded_files=( $(grep -e 'saved' -e 'already there' $package.log | \
     sed -e 's/^.* - //g' -e 's/ saved .*//g' \
