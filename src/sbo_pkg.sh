@@ -108,5 +108,6 @@ done
 
 echo "$me: Executing $package.SlackBuild"
 sh $package.SlackBuild || exit 1
+rm -f $package.log
 
 echo "$me: done"
