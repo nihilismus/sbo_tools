@@ -65,20 +65,16 @@ fi
 echo "$me: Executing $info_file"
 source $info_file
 
-ARCH=${ARCH:-$(uname -m)}
+md5sums=($(echo $MD5SUM))
+num_md5sums=$(echo $MD5SUM | wc -w)
+downloads=$DOWNLOAD
 
-case $ARCH in
-	"x86_64")
-		md5sums=($(echo $MD5SUM_x86_64))
-		num_md5sums=$(echo $MD5SUM_x86_64 | wc -w)
-		downloads=$DOWNLOAD_x86_64
-		;;
-	*)
-		md5sums=($(echo $MD5SUM))
-		num_md5sums=$(echo $MD5SUM | wc -w)
-		downloads=$DOWNLOAD
-		;;
-esac
+ARCH=${ARCH:-$(uname -m)}
+if [ "$ARCH" = "x86_64" ] && [ ! -z "$DOWNLOAD_x86_64" ] && [ ! -z "$MD5SUM_x86_64" ]; then
+    md5sums=($(echo $MD5SUM_x86_64))
+    num_md5sums=$(echo $MD5SUM_x86_64 | wc -w)
+    downloads=$DOWNLOAD_x86_64
+fi
 
 if [ -z "$md5sums" ]; then
     echo "$me: Error, no md5 message digest in $info_file"
