@@ -13,8 +13,6 @@ of The SlackBuilds.org project.
 # Notes
 
 * sbo_tools is not part of The SlackBuilds.org project.
-* There's another well-know tool at http://sbopkg.org if you are interesting
-  in something with a dialog-based-configuration-files-all-in-one-command approach.
 
 # Tools
 
@@ -125,3 +123,13 @@ Same as installation, to uninstall from `/usr/bin` execute:
 
 * hba.nihilismus@gmail.com
 * http://twitter.com/nihilipster
+
+# Related projects
+
+* http://sbopkg.org  
+  If you are interesting in something with a
+  dialog-based-configuration-file-all-in-one-command approach.
+* http://dawnrazor.net/sbotools/  
+  If you want a silver bullet with a
+  im-more-clever-to-tell-you-how-to-manage-your-system-configuration-file approach.
+  
