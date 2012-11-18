@@ -53,6 +53,22 @@ getinfo() {
             head -1 | \
             sed -e 's/BUILD//g' -e 's/=//' -e 's/${:-// ' -e 's/} *$//' -e 's/"//g')
 
+        md5sums=$MD5SUM
+        num_md5sums=$(echo $MD5SUM | wc -w)
+        downloads=$DOWNLOAD
+
+        ARCH=${ARCH:-$(uname -m)}
+        if [ "$ARCH" = "x86_64" ] && [ ! -z "$DOWNLOAD_x86_64" ] && [ ! -z "$MD5SUM_x86_64" ]; then
+            md5sums=$MD5SUM_x86_64
+            num_md5sums=$(echo $MD5SUM_x86_64 | wc -w)
+            downloads=$DOWNLOAD_x86_64
+        fi
+
+        if [ $num_md5sums -gt 1 ]; then
+            md5sums=$(echo $md5sums | sed 's/\s/\\n    /g' | sed 's/^/\\n    /')
+            downloads=$(echo $downloads | sed 's/\s/\\n    /g' | sed 's/^/\\n    /')
+        fi
+
         # Print information we've got.
         echo "Package:  $PRGNAM"
         echo "  Location:  $1"
@@ -60,11 +76,24 @@ getinfo() {
         echo "  Version:  $VERSION"
         echo "  Build:  $build"
         echo "  Homepage:  $HOMEPAGE"
-        echo "  Source URL:  "$(echo $DOWNLOAD | xargs)
-        echo "  Source MD5:  "$(echo $MD5SUM | xargs)
         echo "  Maintainer:  $MAINTAINER"
         echo "  Maintainer Email:  $EMAIL"
-        echo "  Approved by SBo Admin(s):  $APPROVED"
+        if [ ! -z "$APPROVED" ]; then
+                echo "  Approved by SBo Admin(s):  $APPROVED"
+        fi
+        if [ ! -z "$REQUIRES" ]; then
+            echo -n "  Requires:  "
+            if [ $(echo $REQUIRES | sed 's/%README.*%//' | wc -w) -gt 1 ]; then
+                echo
+                for require in $(echo $REQUIRES | sed 's/%README.*%//'); do
+                    echo "    "$(sbo_find -e $require)
+                done
+            else
+                echo $(sbo_find -e $(echo $REQUIRES | sed 's/%README.*%//'))
+            fi
+        fi
+        echo -e "  Source(s) URL:  $downloads"
+        echo -e "  Source(s) MD5:  $md5sums"
     fi
 }
 
