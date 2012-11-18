@@ -12,7 +12,12 @@ of The SlackBuilds.org project.
 
 # Notes
 
-* sbo_tools is not part of The SlackBuilds.org project.
+* sbo_tools is not part of The SlackBuilds.org (SBo) project.
+* sbo_tools is not for an specific Slackware Linux version but its daily use it is for the
+  Slackware Linux version you have installed so there is no way to access a different
+  SBo repository version.
+* From the previous note, sbo_tools depends on the content of `/etc/slackware-version` to
+  work without the need for a configuration file/option.
 
 # Tools
 
@@ -42,9 +47,6 @@ in another directory execute, for example:
 This would install the tools inside `/usr/bin`
 
 # Setup
-
-Something important about sbo_tools is that they depend on the content of
-`/etc/slackware-version` to work without the need for a configuration file/option.
 
 Once you have installed sbo_tools, as root execute:
 
@@ -87,6 +89,12 @@ sent 324.14K bytes  received 25.61M bytes  102.29K bytes/sec
 total size is 24.46M  speedup is 0.94
 sbo_sync: done
 ```
+If you want to mantain your local repository, lets say, inside `/home/sbo`,
+you can create a symlink as root:
+
+`ln -s /home/sbo /usr/ports`
+
+and sbo_tools should just works.
 
 # Usage
 
