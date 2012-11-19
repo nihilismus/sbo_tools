@@ -43,6 +43,22 @@ Examples:
 EOF
 }
 
+search() {
+    asterisk=$(echo $1 | grep '*' || echo '')
+    if [ -z "$asterisk" ]; then
+        results=$(find $local_repository/ -maxdepth 2 -mindepth 2 -type d -iname "*$1*")
+    else
+        results=$(find $local_repository/ -maxdepth 2 -mindepth 2 -type d -iname "$1")
+    fi
+    echo $results
+}
+
+searchexactly() {
+    string=$(echo $1 | sed 's/\*//g')
+    results=$(find $local_repository/ -maxdepth 2 -mindepth 2 -type d -name "$string")
+    echo $results
+}
+
 set -f
 set -e
 
@@ -77,31 +93,28 @@ case $# in
             usage
             exit
         fi
-        search=$1
-        asterisk=$(echo $1 | grep '*' || echo '')
-        if [ -z "$asterisk" ]; then
-            results=$(find $local_repository/ -maxdepth 2 -mindepth 2 -type d -iname "*$search*")
-        else
-            results=$(find $local_repository/ -maxdepth 2 -mindepth 2 -type d -iname "$search")
-        fi
-        ;;
-    2)
-        search=$2
-        if [ $1 = "-e" ]; then
-            results=$(find $local_repository/ -maxdepth 2 -mindepth 2 -type d -iname "$search")
-        else
-            usage
-            exit
-        fi
+        results=$(search $1)
         ;;
     *)
-        usage
-        exit 1
+        results=""
+        if [ $1 = "-e" ]; then
+            for string in $@
+            do
+                shift
+                results="$results $(searchexactly $1)"
+            done
+        fi
+        for string in $@
+        do
+            results="$results $(search $1)"
+        done
         ;;
 esac
 
+# To erase blank spaces in case there is no result
+results=$(echo $results)
+
 if [ -z "$results" ]; then
-    echo "$me: Error, no results for '$search'"
     exit 1
 fi
 
