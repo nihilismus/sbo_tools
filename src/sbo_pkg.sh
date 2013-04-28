@@ -88,7 +88,8 @@ fi
 
 echo "$me: Downloading $downloads"
 
-wget \
+# The correct detection of the downloaded file depends on wget output (english)
+LANG=en_US LC_ALL=en_US wget \
     --progress=bar \
     --no-check-certificate \
     --timeout=60 \
