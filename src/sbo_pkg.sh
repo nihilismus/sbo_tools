@@ -96,10 +96,10 @@ wget \
     --continue \
     $downloads 2>&1 | tee $package.log
 
-downloaded_files=( $(grep -e 'saved' -e 'already there' $package.log | \
+downloaded_files=( "$(grep -e 'saved' -e 'already there' $package.log | \
     sed -e 's/^.* - //g' -e 's/ saved .*//g' \
     -e 's/^File //g' -e 's/ already there.*//g' \
-    -e 's/'\''//g' -e 's/'\`'//g' -e 's/'\‘'//g' -e 's/'\’'//g' -e 's/'\“'//g' -e 's/'\”'//g') )
+    -e 's/'\''//g' -e 's/'\`'//g' -e 's/'\‘'//g' -e 's/'\’'//g' -e 's/'\“'//g' -e 's/'\”'//g')" )
 
 echo "$me: Checking MD5 message digest"
 
