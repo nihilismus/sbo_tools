@@ -37,6 +37,7 @@ if [ -z "$sbo_rsync_modules" ]; then
 fi
 
 # Detect the slackware version from /etc/slackware-version
+slk_version=""
 for module in $sbo_rsync_modules; do
     matched=$(grep "$module" /etc/slackware-version || echo '')
     if [ ! -z "$matched" ]; then
@@ -44,16 +45,18 @@ for module in $sbo_rsync_modules; do
     fi
 done
 
-local_repository="/usr/ports/$slk_version"
-
-if [ ! -d $local_repository/ ]; then
-    echo "$me: Error, directory $local_repository does not exist."
+if [ -z "$slk_version" ]; then
+    echo "$me: Error, the version of Slackware could not be determined."
+    echo "  This means that you have an incorrect content in /etc/slackware-version"
+    echo "  or that SBo still does not have a repository for '$(cat /etc/slackware-version)'"
     exit 1
 fi
 
-if [ ! -f $local_repository/ChangeLog.txt ]; then
-    echo "$me: Error, file $local_repository/ChangeLog.txt does not exist."
-    exit 1
+local_repository="/usr/ports/$slk_version"
+
+if [ ! -d $local_repository/ ]; then
+    mkdir -p $local_repository
+    touch $local_repository/ChangeLog.txt
 fi
 
 touch $local_repository/.writable 2>&1
@@ -70,7 +73,12 @@ sbo_rsync_module="slackbuilds/$slk_version"
 cd $local_repository/ || exit 1
 
 echo "$me: rsync:://$sbo_rsync_server/$sbo_rsync_module => $(pwd)"
-sleep 5
+echo -n "$me: synchronizing in 5 segs "
+for dot in 1 2 3 4 5; do
+    sleep 1
+    echo -n '.'
+done
+echo
 
 rsync \
     --protect-args \
