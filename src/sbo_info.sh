@@ -5,19 +5,20 @@ me=$(basename $0)
 usage() {
 cat << EOF
 Usage:
-$me package_directory
+$me directory
 
 About:
-It displays information about a package build script directory from
-the local repository. It reads its info, SlackBuild and slack-desc
-files to display a formated output.
+$me displays information about a package build script directory.
+It reads its info, SlackBuild and slack-desc files to display
+a formated output. If a list of directories are passed as parameters
+then displays information for earch one.
 
 Examples:
 
   Search SlackBuilds with 'libsigc' in its name and print
   information about them:
 
-    $me \$(sbo_find libsigc++)
+    $me \$(sbo_find libsigc)
 
   To stress your system:
 
@@ -32,15 +33,18 @@ getinfo() {
     packageslk="$1/$packagename.SlackBuild"
 
     required_files="$packagedesc $packageinfo $packageslk"
+    fail=""
     for file in $required_files
     do
         if [ ! -r "$file" ]; then
            fail+="$(basename $file),"
         fi
     done
+    fail=$(echo $fail | sed 's/,$//')
 
     if [ ! -z "$fail" ]; then
         echo "${0##*/}: Error, cant find $fail inside $1"
+        return 1
     else
         # Get information from slack-desc file
         about=$(sed -n '/^'$packagename':/ s/^'$packagename': // p' $packagedesc | sed q | sed '/[ \t\v\f]\+/ !d')
@@ -145,7 +149,8 @@ case $# in
         do
             if [ -d "$string" ]; then
                 cd "$string"
-                getinfo $(pwd)
+                # Force the execution for the next strings
+                getinfo $(pwd) || true
                 cd "$cwd"
             else
                 echo "$me: Error, $string is not a directory"
