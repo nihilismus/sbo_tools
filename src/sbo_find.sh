@@ -46,9 +46,9 @@ EOF
 search() {
     asterisk=$(echo $1 | grep '*' || echo '')
     if [ -z "$asterisk" ]; then
-        results=$(find $local_repository/ -maxdepth 2 -mindepth 2 -type d -iname "*$1*")
+        results=$(find $local_repository/ -maxdepth 2 -mindepth 2 -type d -iname "*$1*" | grep -v '.git')
     else
-        results=$(find $local_repository/ -maxdepth 2 -mindepth 2 -type d -iname "$1")
+        results=$(find $local_repository/ -maxdepth 2 -mindepth 2 -type d -iname "$1" | grep -v '.git')
     fi
     echo $results
 }
