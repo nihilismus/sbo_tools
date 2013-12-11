@@ -41,7 +41,7 @@ EOF
 search() {
     find /var/log/packages/ -maxdepth 1 -mindepth 1 -type f \
         -iname "$1" -printf '%CY-%Cm-%Cd  %CH:%CM:%CS  %f\n' | \
-        sed 's/\.0\{10\}//' | sed 's/$/\n/' | \
+        sed 's/\.[0-9]\{10\}//' | sed 's/$/\n/' | \
         sed '/^ *$/d' | sort -r
 }
 
