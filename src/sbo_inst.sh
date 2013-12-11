@@ -66,7 +66,7 @@ case $# in
                 package=$(sbo_info "$1" | grep 'Package:' | sed 's/^.*: *//')
                 version=$(sbo_info "$1" | grep 'Version:' | sed 's/^.*: *//')
                 build=$(sbo_info "$1" | grep 'Build:' | sed 's/^.*: *//')
-                result=$(search "$package-$version-*-$build*" | awk '{print $3"\\n"}')
+                result=$(search "$package-$version*-*-$build*" | awk '{print $3"\\n"}')
 
                 if [ -z "$result" ]; then
                     echo "$me: $(basename $1) is not installed."
