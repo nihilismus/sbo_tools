@@ -65,12 +65,9 @@ if [ $? -ne 0 ]; then
     pkgsbysbo=""
 fi
 
-if [ -z "$pkgsbytag" ] && [ -z "$pkgsbysbo" ]; then
-    echo "$me: Error, no package installed with TAG $TAG or _SBo."
-    exit 1
+if [ -n "$pkgsbytag" -o -n "$pkgsbysbo" ]; then
+    for pkgs in $pkgsbytag $pkgsbysbo
+    do
+        checkupdate $pkgs
+    done
 fi
-
-for pkgs in $pkgsbytag $pkgsbysbo
-do
-    checkupdate $pkgs
-done
