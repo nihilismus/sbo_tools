@@ -85,9 +85,11 @@ getinfo() {
         if [ ! -z "$APPROVED" ]; then
                 echo "  Approved by SBo Admin(s):  $APPROVED"
         fi
-        if [ ! -z "$REQUIRES" ]; then
+        num_requires=$(echo "$REQUIRES" | sed 's/%README.*%//' | wc -w)
+        if [ $num_requires -gt 0 ]; then
+            REQUIRES=$(echo $REQUIRES | sed 's/%README.*%//')
             echo -n "  Requires:  "
-            if [ $(echo $REQUIRES | sed 's/%README.*%//' | wc -w) -gt 1 ]; then
+            if [ $num_requires -gt 1 ]; then
                 echo
                 for require in $(echo $REQUIRES | sed 's/%README.*%//'); do
                     echo "    "$(sbo_find -e $require)
