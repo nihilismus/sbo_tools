@@ -30,46 +30,25 @@ set -e
 
 search() {
     server="http://slackbuilds.org"
-    resource="result/?search=$1&sv=$slk_version"
+    resource="result/?search=$1"
 
-    result=$(lynx -dump "$server/$resource" | grep \
-        "$server/repository/" | \
-        sed 's/^.*repository/\/usr\/ports/' | \
-        sed "/\/usr\/ports\/$slk_version\/$/d" | sort)
+    result="$(lynx -noredir -dump "$server/$resource" 2>/dev/null | \
+        grep -a $server/repository | \
+        sed 's/^.*repository/\/usr\/ports/' | sort | uniq)"
 
     echo "Search Results for '$1':"
 
     for directory in $result; do
+        package="$(echo $directory | cut -d '/' -f 5,6)"
+
         about=""
-        if [ -f "$directory/slack-desc" ]; then
-            about=$(grep -A 1 'handy-ruler' $directory/slack-desc | \
+        if [ -f "/usr/ports/$package/slack-desc" ]; then
+            about=$(grep -A 1 'handy-ruler' /usr/ports/$package/slack-desc | \
                 tail -1 | sed -e 's/^.* (//' -e 's/) *$//')
+            echo "/usr/ports/$package  $about"
         fi
-        echo $directory $about | sed -e 's/\/ / /' \
-            -e 's/  */ /g' -e 's/\/$//'
     done
 }
-
-directories=$(find /usr/ports/ -type d -mindepth 1 -maxdepth 1  -exec basename {} \;)
-if [ -z "$directories" ]; then
-    echo "$me: Error, /usr/ports seems to be empty"
-    exit 1
-fi
-
-# Detect the slackware version from /etc/slackware-version
-for directory in $directories; do
-    matched=$(grep "$directory" /etc/slackware-version || echo '')
-    if [ ! -z "$matched" ]; then
-        slk_version=$directory
-    fi
-done
-
-local_repository="/usr/ports/$slk_version"
-
-if [ ! -d $local_repository/ ]; then
-    echo "$me: Error, directory $local_repository does not exist."
-    exit 1
-fi
 
 case $# in
     0)

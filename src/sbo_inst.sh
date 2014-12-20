@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-me=$(basename $0)
-
 set -f
 set -e
+
+me=$(basename $0)
 
 usage() {
 cat << EOF
@@ -20,21 +20,6 @@ In case of a directory then it gets information from directory.info
 and directory.SlackBuild to see if the SlackBuild is installed
 (same VERSION and BUILD), if this is the case then prints a
 formated output just as the previous paragraph.
-
-Options:
--n: print just the matching names.
-
-Examples:
-
-  This prints all packages that starts with 'lib*'.
-    $me 'lib*'
-
-  This prints just the names of all packages that end with '_SBo'.
-    $me -n '*_SBo'
-
-  If vlc is installed then prints its entry in /var/log/packages
-    $me \$(sbo_find -e vlc)
-
 EOF
 }
 
@@ -62,10 +47,10 @@ case $# in
         fi
 
         if [ -d "$1" ]; then
-            if $(sbo_info "$1" >/dev/null 2>&1); then
-                package=$(sbo_info "$1" | grep 'Package:' | sed 's/^.*: *//')
-                version=$(sbo_info "$1" | grep 'Version:' | sed 's/^.*: *//')
-                build=$(sbo_info "$1" | grep 'Build:' | sed 's/^.*: *//')
+            if sbo_info "$1" 1>/dev/null 2>/dev/null; then
+                package=$(sbo_info -p "$1")
+                version=$(sbo_info -v "$1")
+                build=$(sbo_info -b "$1")
                 result=$(search "$package-$version*-*-$build*" | awk '{print $3"\\n"}')
 
                 if [ -z "$result" ]; then
@@ -89,8 +74,8 @@ case $# in
         fi
 
         if [ -z "$result" ]; then
-            echo "$me: Error, no results for '$1'"
-            exit 1
+            echo "$me: No results for '$1'"
+            exit
         fi
 
         echo -e $result | sed -e 's/^ //' -e '/^$/d'
@@ -106,8 +91,8 @@ case $# in
             fi
 
             if [ -z "$result" ]; then
-                echo "$me: Error, no results for '$2'"
-                exit 1
+                echo "$me: No results for '$2'"
+                exit
             fi
 
             echo -e $result | sed -e 's/^ //' -e '/^$/d'

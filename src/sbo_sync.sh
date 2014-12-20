@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 me=$(basename $0)
 
 usage() {
@@ -8,14 +10,10 @@ Usage:
 $me
 
 About:
-$me synchronize a local repository of Slackware build scripts
-from http://www.slackbuilds.org project.
-
-The local repository is set to /usr/ports.
+$me synchronize /usr/ports with slackbuilds.org repository,
+based on the version of your Slackware system.
 EOF
 }
-
-set -e
 
 if [ $# -ne 0 ]; then
     usage
@@ -23,63 +21,48 @@ if [ $# -ne 0 ]; then
 fi
 
 if [ $(id --user) -ne 0 ]; then
-    echo "$me: Error, you do not have root permissions."
+    echo "$me: Error, just the root user can execute this script"
     exit 1
 fi
 
-# Get a list of slackware versions available at SBo's rsyncd
-sbo_rsync_modules=$(rsync slackbuilds.org::slackbuilds | awk '{print $5}' | \
-    sed 's/^.$//')
+if [ -f /usr/ports/in_use ]; then
+    echo "$me: Error, there is another instance in execution"
+    exit 1
+else
+    touch /usr/ports/in_use
+fi
+
+# Get a list of available repositories at slackbuilds.org
+sbo_rsync_modules="$(rsync slackbuilds.org::slackbuilds 2>/dev/null | awk '{print $5}' | sed 's/^.$//')"
 
 if [ -z "$sbo_rsync_modules" ]; then
-    echo "$me: Error, while contacting slackbuilds.org"
+    echo "$me: Error, the list of available repositories at slackbuilds.org could be not retrieved"
     exit 1
 fi
 
-# Detect the slackware version from /etc/slackware-version
-slk_version=""
+# Detect the matching repository for the Slackware version in this system
 for module in $sbo_rsync_modules; do
-    matched=$(grep "$module" /etc/slackware-version || echo '')
-    if [ ! -z "$matched" ]; then
+    if grep $module /etc/slackware-version 1>/dev/null 2>/dev/null; then
         slk_version=$module
     fi
 done
 
 if [ -z "$slk_version" ]; then
-    echo "$me: Error, the version of Slackware could not be determined."
-    echo "  This means that you have an incorrect content in /etc/slackware-version"
-    echo "  or that SBo still does not have a repository for '$(cat /etc/slackware-version)'"
+    echo "$me: Error, can find a repository for '$(cat /etc/slackware-version)' at slackbuilds.org"
     exit 1
 fi
 
-local_repository="/usr/ports/$slk_version"
-
-if [ ! -d $local_repository/ ]; then
-    mkdir -p $local_repository
-    touch $local_repository/ChangeLog.txt
-fi
-
-touch $local_repository/.writable 2>&1
-if [ $? -ne 0 ]; then
-    echo "$me: Error, $local_repository is not writable"
-    exit 1
-fi
-rm -f $local_repository/.writable
-
-sbo_rsync_server="slackbuilds.org"
-sbo_rsync_module="slackbuilds/$slk_version"
-
-# As a "security" step before executing rsync.
-cd $local_repository/ || exit 1
-
-echo "$me: rsync:://$sbo_rsync_server/$sbo_rsync_module => $(pwd)"
+echo "$me: rsync:://slackbuilds.org/slackbuilds/$slk_version => /usr/ports"
 echo -n "$me: synchronizing in 5 segs "
 for dot in 1 2 3 4 5; do
     sleep 1
     echo -n '.'
 done
+
+echo
 echo
 
+rsync_error=0
 rsync \
     --protect-args \
     --human-readable \
@@ -87,17 +70,22 @@ rsync \
     --compress \
     --verbose \
     --delete \
+    --delete-after \
     --delete-excluded \
     --no-perms \
     --no-owner \
     --no-group \
     --exclude='/*/*.tar.gz' \
     --exclude='/*/*.tar.gz.asc' \
-    "$sbo_rsync_server"::"$sbo_rsync_module/" .
+    --exclude='/in_use' \
+    --safe-links \
+    "slackbuilds.org::slackbuilds/$slk_version/" /usr/ports || rsync_error=$? && true
 
-if [ $? -ne 0 ]; then
-    echo "$me: Error, there was an error with rsync execution"
+if [ $rsync_error -ne 0 ]; then
+    echo
+    echo "$me: Error, rsync execution failed"
     exit 1
 fi
 
+echo
 echo "$me: done"
