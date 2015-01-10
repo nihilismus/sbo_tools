@@ -48,9 +48,9 @@ case $# in
 
         if [ -d "$1" ]; then
             if sbo_info "$1" 1>/dev/null 2>/dev/null; then
-                package=$(sbo_info -p "$1")
-                version=$(sbo_info -v "$1")
-                build=$(sbo_info -b "$1")
+                package=$(sbo_info "$1" | grep -E 'Package:' | sed 's/.*  //')
+                version=$(sbo_info "$1" | grep -E 'Version:' | sed 's/.*  //')
+                build=$(sbo_info "$1" | grep 'Build:' | sed 's/.*  //')
                 result=$(search "$package-$version*-*-$build*" | awk '{print $3"\\n"}')
 
                 if [ -z "$result" ]; then
