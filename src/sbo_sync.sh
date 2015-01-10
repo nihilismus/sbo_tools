@@ -84,6 +84,7 @@ rsync \
 if [ $rsync_error -ne 0 ]; then
     echo
     echo "$me: Error, rsync execution failed"
+    rm -f /usr/ports/in_use
     exit 1
 fi
 
